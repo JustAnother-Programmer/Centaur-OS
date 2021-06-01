@@ -1,5 +1,6 @@
 #include "kernel.h"
 #include "idt/idt.h"
+#include "io/io.h"
 #include <stdint.h>
 #include <stddef.h>
 
@@ -78,4 +79,6 @@ void kernel_main()
     print("Welcome to Centaur OS!\n");
 
     idt_init();
+
+    outb(0x60, 0xff);
 }
