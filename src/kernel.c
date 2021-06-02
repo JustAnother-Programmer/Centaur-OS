@@ -1,6 +1,7 @@
 #include "kernel.h"
 #include "idt/idt.h"
 #include "io/io.h"
+#include "memory/heap/kheap.h"
 #include <stdint.h>
 #include <stddef.h>
 
@@ -77,6 +78,8 @@ void kernel_main()
 {
     terminal_init();
     print("Welcome to Centaur OS!\n");
+
+    kheap_init();
 
     idt_init();
 }
