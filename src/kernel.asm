@@ -30,8 +30,6 @@ _start:
     mov al, 00000001b
     out 0x21, al
 
-    sti
-
     call kernel_main
 
     jmp $
