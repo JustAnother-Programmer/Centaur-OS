@@ -77,6 +77,7 @@ void print(const char* str)
 void kernel_main()
 {
     terminal_init();
+    
     print("Welcome to Centaur OS!\n");
 
     kheap_init();
