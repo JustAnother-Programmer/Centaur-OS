@@ -3,6 +3,7 @@
 #include "io/io.h"
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
+#include "disk/disk.h"
 #include <stdint.h>
 #include <stddef.h>
 
@@ -84,6 +85,8 @@ void kernel_main()
     print("Welcome to Centaur OS! Loading System...\n");
 
     kheap_init();
+
+    disk_search_and_init();
 
     idt_init();
 
