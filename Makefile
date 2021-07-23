@@ -63,5 +63,4 @@ clean:
 	rm -rf ./bin/kernel.bin
 	rm -rf ./bin/os.bin
 	rm -rf ./build/kernelfull.o
-	rm -rf ./release/x86/CentaurOS.iso
 	rm -rf $(FILES)
