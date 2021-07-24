@@ -6,7 +6,10 @@ all: ./bin/boot.bin ./bin/kernel.bin
 	rm -rf ./bin/os.bin
 	dd if=./bin/boot.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
-	dd if=/dev/zero bs=512 count=100 >> ./bin/os.bin
+	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
+	sudo mount -t vfat ./bin/os.bin /mnt/d
+	sudo cp ./msg.txt /mnt/d
+	sudo umount /mnt/d
 	dd if=./bin/os.bin >> ./release/raw/os.bin
 
 ./bin/kernel.bin: $(FILES)
