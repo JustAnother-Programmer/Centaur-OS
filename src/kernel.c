@@ -95,6 +95,13 @@ void kernel_main()
 
     print("Loading complete.\n");
 
+    int fd = fopen("0:/msg.txt", "r");
+
+    if(fd)
+    {
+        print("Successfully opened file msg.txt\n");
+    }
+
     while(1) 
     {
         

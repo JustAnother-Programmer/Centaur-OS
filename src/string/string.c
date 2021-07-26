@@ -26,6 +26,15 @@ int strnlen(const char* ptr, int max)
     return i;
 }
 
+char tolower(char s1)
+{
+    if(s1 >= 65 && s1 <= 90)
+    {
+        s1 += 32;
+    }
+
+    return s1;
+}
 
 bool isdigit(char c)
 {
@@ -51,4 +60,54 @@ char* strcopy(char* dest, const char* src)
     *dest = 0x00;
 
     return res;
+}
+
+int strncmp(const char* str1, const char* str2, int n)
+{
+    unsigned char u1, u2;
+
+    while(n-- > 0)
+    {
+        u1 = (unsigned char)*str1++;
+        u2 = (unsigned char)*str2++;
+
+        if(u1 != u2)
+            return u1 - u2;
+        
+        if(u1 == '\0')
+            return 0;
+    }
+
+    return 0;
+}
+
+int strnlen_terminator(const char* str, int max, char terminator)
+{
+    int i = 0;
+    for(i = 0; i < max; i++)
+    {
+        if(str[i] == '\0' || str[i] == terminator)
+            break;
+    }
+
+    return i;
+}
+
+int istrncmp(const char* s1, const char* s2, int n)
+{
+    unsigned char u1, u2;
+
+    while(n-- > 0)
+    {
+        u1 = (unsigned char)*s1++;
+        u2 = (unsigned char)*s2++;
+
+        if(u1 != u2 && tolower(u1) != tolower(u2))
+            return u1 - u2;
+
+        if(u1 == '\0')
+            return 0;
+    }
+
+    return 0;
 }
