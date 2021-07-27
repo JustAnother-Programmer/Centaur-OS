@@ -99,7 +99,11 @@ void kernel_main()
 
     if(fd)
     {
-        print("Successfully opened file msg.txt\n");
+        print("\nSuccessfully opened file msg.txt\n");
+        char buf[14];
+        fread(buf, 13, 1, fd);
+        buf[13] = 0x00;
+        print(buf);
     }
 
     while(1) 
