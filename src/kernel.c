@@ -108,6 +108,9 @@ void kernel_main()
         buf[13] = 0x00;
 
         print(buf);
+
+        struct file_stat s;
+        fstat(fd, &s);
     }
 
     while(1) 
