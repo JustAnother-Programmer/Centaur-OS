@@ -1,11 +1,14 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "kernel.h"
+#include "config.h"
 #include "idt/idt.h"
 #include "io/io.h"
+#include "memory/memory.h"
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
 #include "disk/disk.h"
+#include "gdt/gdt.h"
 #include "fs/pparser.h"
 #include "string/string.h"
 #include "fs/file.h"
@@ -77,11 +80,24 @@ void panic(const char* msg)
     while(1) {}
 }
 
+struct gdt gdt_real[CENTAUROS_TOTAL_GDT_SEGMENTS];
+struct gdt_structured gdt_structured[CENTAUROS_TOTAL_GDT_SEGMENTS] = {
+    {.base = 0x00, .limit = 0x00, .type = 0x00},
+    {.base = 0x00, .limit = 0xffffffff, .type = 0x9a},
+    {.base = 0x00, .limit = 0xffffffff, .type = 0x92}
+};
+
 void kernel_main()
 {
     terminal_init();
     
     print("Welcome to Centaur OS! Loading System...\n");
+
+    memset(gdt_real, 0x00, sizeof(gdt_real));
+
+    gdt_structured_to_gdt(gdt_real, gdt_structured, CENTAUROS_TOTAL_GDT_SEGMENTS);
+
+    gdt_load(gdt_real, sizeof(gdt_real));
 
     kheap_init();
 
