@@ -129,30 +129,5 @@ void kernel_main()
 
     print("Loading complete.\n");
 
-    int fd = fopen("0:/msg.txt", "r");
-
-    if(fd)
-    {
-        print("\nSuccessfully opened file msg.txt\n");
-        char buf[14];
-        
-        fseek(fd, 2, SEEK_SET);
-        fread(buf, 11, 1, fd);
-
-        buf[13] = 0x00;
-
-        print(buf);
-
-        struct file_stat s;
-        fstat(fd, &s);
-
-        fclose(fd);
-
-        print("\nFile closed successfully\n");
-    }
-
-    while(1) 
-    {
-        
-    }
+    while(1) {}
 }
