@@ -3,6 +3,7 @@
 #include "kernel.h"
 #include "config.h"
 #include "idt/idt.h"
+#include "task/tss.h"
 #include "io/io.h"
 #include "memory/memory.h"
 #include "memory/heap/kheap.h"
@@ -80,11 +81,16 @@ void panic(const char* msg)
     while(1) {}
 }
 
+struct tss tss;
+
 struct gdt gdt_real[CENTAUROS_TOTAL_GDT_SEGMENTS];
 struct gdt_structured gdt_structured[CENTAUROS_TOTAL_GDT_SEGMENTS] = {
-    {.base = 0x00, .limit = 0x00, .type = 0x00},
-    {.base = 0x00, .limit = 0xffffffff, .type = 0x9a},
-    {.base = 0x00, .limit = 0xffffffff, .type = 0x92}
+    {.base = 0x00, .limit = 0x00, .type = 0x00}, // Null seg
+    {.base = 0x00, .limit = 0xffffffff, .type = 0x9a}, // Kernel code seg
+    {.base = 0x00, .limit = 0xffffffff, .type = 0x92}, // Kernel data seg
+    {.base = 0x00, .limit = 0xffffffff, .type = 0xf8}, // User code seg
+    {.base = 0x00, .limit = 0xffffffff, .type = 0xf2}, // User data seg
+    {.base = (uint32_t)&tss, .limit = sizeof(tss), .type = 0xE9} // TSS Seg
 };
 
 void kernel_main()
@@ -106,6 +112,12 @@ void kernel_main()
     disk_search_and_init();
 
     idt_init();
+
+    memset(&tss, 0x00, sizeof(tss));
+    tss.esp0 = 0x600000;
+    tss.ss0 = KERNEL_DATA_SELECTOR;
+
+    tss_load(0x28);
 
     kernel_chunk = paging_new_4gb(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
 
