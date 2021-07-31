@@ -40,5 +40,12 @@ struct task* task_new(struct process* process);
 struct task* task_current();
 struct task* task_get_next();
 int task_free(struct task* task);
+int task_switch(struct task* task);
+void task_run_first_ever_task();
+int task_page();
+
+void task_return(struct registers* regs);
+void user_registers();
+void restore_general_purpose_registers(struct registers* regs);
 
 #endif
