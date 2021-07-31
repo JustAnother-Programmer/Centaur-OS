@@ -22,7 +22,7 @@ task_return:
     mov es, ax
     mov fs, ax
     mov gs, ax
-    push dword [ebx + 4]
+    push dword [ebp + 4]
     call restore_general_purpose_registers
     add esp, 4
     iretd

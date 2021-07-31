@@ -9,6 +9,7 @@ all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
 	sudo mount -t vfat ./bin/os.bin /mnt/d
 	sudo cp ./msg.txt /mnt/d
+	sudo cp ./programs/blank/blank.bin /mnt/d
 	sudo umount /mnt/d
 	dd if=./bin/os.bin >> ./release/raw/os.bin
 

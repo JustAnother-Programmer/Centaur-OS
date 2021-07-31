@@ -8,8 +8,11 @@
 #include "memory/memory.h"
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
+#include "task/task.h"
+#include "task/process.h"
 #include "disk/disk.h"
 #include "gdt/gdt.h"
+#include "status.h"
 #include "fs/pparser.h"
 #include "string/string.h"
 #include "fs/file.h"
@@ -125,7 +128,16 @@ void kernel_main()
 
     enable_paging();
 
-    enable_interrupts();
+    struct process* process = 0;
+
+    int res = process_load("0:/blank.bin", &process);
+
+    if(res != CENTAUROS_ALL_OK)
+    {
+        panic("Failed to load blank.bin\n");
+    }
+
+    task_run_first_ever_task();
 
     print("Loading complete.\n");
 
