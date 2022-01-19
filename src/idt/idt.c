@@ -10,7 +10,7 @@ struct idtr_desc idtr_descriptor;
 
 static ISR80H_COMMAND isr80h_commands[CENTAUROS_MAX_ISR80H_COMMANDS];
 
-extern void idt_load(struct idtr_desc* ptr);
+extern void idt_load(struct idtr_desc *ptr);
 extern void int21h();
 extern void no_interrupt();
 extern void isr80h_wrapper();
@@ -31,23 +31,23 @@ void idt_zero()
     print("ERR: Cannot divide by zero.\n");
 }
 
-void idt_set(int intr_no, void* address)
+void idt_set(int intr_no, void *address)
 {
-    struct idt_desc* desc = &idt_descriptors[intr_no];
-    desc->offset_1 = (uint32_t) address & 0x0000ffff;
+    struct idt_desc *desc = &idt_descriptors[intr_no];
+    desc->offset_1 = (uint32_t)address & 0x0000ffff;
     desc->selector = KERNEL_CODE_SELECTOR;
     desc->zero = 0x00;
     desc->type_attr = 0xEE;
-    desc->offset_2 = (uint32_t) address >> 16;
+    desc->offset_2 = (uint32_t)address >> 16;
 }
 
 void idt_init()
 {
     memset(idt_descriptors, 0, sizeof(idt_descriptors));
     idtr_descriptor.limit = sizeof(idt_descriptors) - 1;
-    idtr_descriptor.base = (uint32_t) idt_descriptors;
+    idtr_descriptor.base = (uint32_t)idt_descriptors;
 
-    for(int i = 0; i < CENTAUROS_TOTAL_INTR; i++)
+    for (int i = 0; i < CENTAUROS_TOTAL_INTR; i++)
     {
         idt_set(i, no_interrupt);
     }
@@ -61,12 +61,12 @@ void idt_init()
 
 void isr80h_register_command(int command_id, ISR80H_COMMAND command)
 {
-    if(command_id <= 0 || command_id >= CENTAUROS_MAX_ISR80H_COMMANDS)
+    if (command_id < 0 || command_id >= CENTAUROS_MAX_ISR80H_COMMANDS)
     {
         panic("Command out of bounds\n");
     }
 
-    if(isr80h_commands[command_id])
+    if (isr80h_commands[command_id])
     {
         panic("Cannot overwrite existing command\n");
     }
@@ -74,18 +74,18 @@ void isr80h_register_command(int command_id, ISR80H_COMMAND command)
     isr80h_commands[command_id] = command;
 }
 
-void* isr80h_handle_command(int command, struct interrupt_frame* frame)
+void *isr80h_handle_command(int command, struct interrupt_frame *frame)
 {
-    void* res = 0;
+    void *res = 0;
 
-    if(command <= 0 || command >= CENTAUROS_MAX_ISR80H_COMMANDS)
+    if (command < 0 || command >= CENTAUROS_MAX_ISR80H_COMMANDS)
     {
         return 0;
     }
 
     ISR80H_COMMAND command_func = isr80h_commands[command];
 
-    if(!command_func)
+    if (!command_func)
     {
         return 0;
     }
@@ -95,9 +95,9 @@ void* isr80h_handle_command(int command, struct interrupt_frame* frame)
     return res;
 }
 
-void* isr80h_handler(int command, struct interrupt_frame* frame)
+void *isr80h_handler(int command, struct interrupt_frame *frame)
 {
-    void* res = 0;
+    void *res = 0;
 
     kernel_page();
     task_current_save_state(frame);
