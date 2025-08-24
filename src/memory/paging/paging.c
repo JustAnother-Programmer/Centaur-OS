@@ -173,3 +173,21 @@ int paging_set(uint32_t* directory, void* virtual_address, uint32_t val)
 
     return 0;
 }
+
+// This function returns the physical address of a given directory and virtual address with the flags or'ed on
+uint32_t paging_get(uint32_t* directory, void* virt)
+{
+    uint32_t dir_idx = 0;
+    uint32_t table_idx = 0;
+    
+    // Get the indexes of the directory and table
+    paging_get_indexes(virt, &dir_idx, &table_idx);
+
+    // Get our directory entry with the index fetched earlier
+    uint32_t entry = directory[dir_idx];
+
+    // Grab the table from the directory entry and or on the flags
+    uint32_t* table = (uint32_t*)(entry & 0xfffff000);
+
+    return table[table_idx];
+}

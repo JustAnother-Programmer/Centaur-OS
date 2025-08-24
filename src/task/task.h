@@ -44,10 +44,10 @@ int task_free(struct task* task);
 int task_switch(struct task* task);
 void task_run_first_ever_task();
 int task_page();
-
 void task_return(struct registers* regs);
 void user_registers();
 void restore_general_purpose_registers(struct registers* regs);
 void task_current_save_state(struct interrupt_frame* frame);
+int copy_string_from_task(struct task* task, void* virt, void* phys, int max);
 
 #endif

@@ -5,6 +5,8 @@
 #include "idt/idt.h"
 #include "memory/memory.h"
 #include "memory/heap/kheap.h"
+#include "memory/paging/paging.h"
+#include "string/string.h"
 
 struct task* current_task = 0;
 struct task* task_tail = 0;
@@ -150,6 +152,61 @@ void task_run_first_ever_task()
 
     task_switch(task_head);
     task_return(&task_head->registers);
+}
+
+int copy_string_from_task(struct task* task, void* virt, void* phys, int max)
+{
+    // Limit this to 1 page size
+    if (max >= PAGING_PAGE_SIZE)
+    {
+        return -EINVARG;
+    }
+
+    int res = 0;
+
+    // Allocate memory to copy a string into
+    char* tmp = kzalloc(max);
+
+    // If we can't allocate the memory return the no memory error
+    if (!tmp)
+    {
+        res = -ENOMEM;
+        goto out;
+    }
+
+    // Virtual address provided to us cannot be accessed directly from kernel space, so we are going to use paging to solve that
+    uint32_t* task_dir = task->page_directory->directory_entry;
+
+    // Get the paging entry from the task
+    uint32_t old_entry = paging_get(task_dir, tmp);
+
+    // The memory we set up earlier can be used to share the memory with task via paging
+    paging_map(task->page_directory, tmp, tmp, PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+
+    // Swap to user page
+    paging_switch(task->page_directory);
+
+    // Copy over the string
+    strncpy(tmp, virt, max);
+
+    // Swap back to kernel page
+    kernel_page();
+
+    res = paging_set(task_dir, tmp, old_entry);
+
+    if (res < 0)
+    {
+        res = -EIO;
+        goto out_free;
+    }
+
+    strncpy(phys, tmp, max);
+
+out_free:
+    kfree(tmp);
+
+out:
+    return res;
 }
 
 int task_init(struct task* task, struct process* process)
